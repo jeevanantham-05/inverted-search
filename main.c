@@ -8,24 +8,26 @@
 
 int main(int argc, char *argstr[])
 {
-    if(argc<=1) //if invalid comnd then, help msg to user
+    // Check if at least one file is provideddd
+    if(argc<=1)
     {
-        printf("Usage:./a.out f1.txt f2.txt... OR ./a.out -u backup.txt\n");
+        printf("Usage:./a.out f1.txt f2.txt... OR./a.out -u backup.txt\n");
         return 0;
     }
 
-    filenames_t *f_head = NULL;
-    hash_t ht[28]; // create table
-    hash(ht); // calling hash function for create table and set link as null
+    filenames_t *f_head = NULL; // head of valid files list
+    hash_t ht[28];
+    hash(ht); // Initialize all hash heads to NULL to avoid garbage values
     int db_created = 0;
 
-    // Update mode
+    // Check for update mode:./a.out -u backup.txt
     if(strcmp(argstr[1], "-u")==0 || strcmp(argstr[1], "-U")==0)
     {
         if(argc < 3){
             printf("Info: Update needs backup file\n");
             return 0;
         }
+        // Restore database from backup file
         if(update_database(ht, &f_head, argstr[2])==success)
         {
             printf("Update: Database restored from %s\n", argstr[2]);
@@ -35,18 +37,20 @@ int main(int argc, char *argstr[])
             printf("Update failed\n");
             return 0;
         }
-        // validate remaining files after -u backup
+        // Validate any new files given after backup file
         file_list_validation(argc, argstr, &f_head);
         if(f_head!=NULL)
-            insert(f_head, ht);
+            insert(f_head, ht); // Insert new files into existing database
     }
     else
     {
+        // validate input files
         if(file_list_validation(argc, argstr, &f_head)==invalid)
         {
             printf("No valid files found\n");
             return 0;
         }
+        // Insert only validated files from f_head
         if(insert(f_head, ht)==success)
         {
             printf("Database created successfully\n");
@@ -59,7 +63,7 @@ int main(int argc, char *argstr[])
         return 0;
     }
 
-    /*...........MENU............*/
+    /*....................MENU....................*/
     int choice;
     char word[WORD_SIZE], sfile[FNAME_SIZE];
     while(1)
@@ -73,68 +77,68 @@ int main(int argc, char *argstr[])
         scanf("%d", &choice);
         switch(choice)
         {
-            case 1:
-                printf("Database already created\n"); break;
-            case 2:
-                display_database(ht); break;
+            case 2: // printing
+            display_database(ht); 
+            break; 
             case 3:
                 printf("Enter word to search: ");
                 scanf("%s", word);
-                search_database(ht, word);
+                search_database(ht, word); // Search specific word
                 break;
             case 4:
                 printf("Enter backup filename (ex: backup.txt): ");
                 scanf("%s", sfile);
-                save_database(ht, sfile);
+                save_database(ht, sfile); // Save database to file
                 break;
             case 5:
                 printf("Enter new file to add: ");
                 scanf("%s", sfile);
                 char *temp_argv[] = {"./a.out", sfile, NULL};
                 filenames_t *new_head = NULL;
-                file_list_validation(2, temp_argv, &new_head);
+                file_list_validation(2, temp_argv, &new_head); // Validate new file
                 if(new_head) insert(new_head, ht);
                 break;
             case 6: return 0;
-            default: printf("Invalid choice\n");
         }
     }
     return 0;
 }
 
-int is_txt(char *file) // check.txt extn only
+// Check if file has.txt extension
+int is_txt(char *file)
 {
-    char *dot = strrchr(file, '.');
+    char *dot = strrchr(file, '.'); // find last dot in filename
     if(dot && strcmp(dot, ".txt")==0)
         return 1;
     return 0;
 }
 
-int is_file_empty(char *file)  //atleast one char should be present
+// Check if file is empty using ftell
+int is_file_empty(char *file)
 {
     FILE *fp = fopen(file,"r");
     if(!fp) return 1;
-    fseek(fp,0,SEEK_END);
-    long size = ftell(fp);
+    fseek(fp,0,SEEK_END); // move end of file
+    long size = ftell(fp); // get file size
     fclose(fp);
     if(size==0) return 1;
     return 0;
 }
 
-/*check curr file is present in SLL or not*/
+// Check for duplicate files in the list
 int check_duplicate(filenames_t *head, char *file)
 {
     filenames_t *temp = head;
     while(temp!=NULL)
     {
         if(strcmp(temp->filename,file)==0)
-            return 1;
+            return 1; // duplicate found
         temp = temp->link;
     }
     return 0;
 }
 
-/*IF function fails shows ERRORS here.....*/
+// file validation 
 int file_list_validation(int argc, char *argv[], filenames_t **head)
 {
     int valid_count=0;
@@ -143,7 +147,7 @@ int file_list_validation(int argc, char *argv[], filenames_t **head)
         if(argv[i]==NULL) continue;
         if(strcmp(argv[i], "-u")==0 || strcmp(argv[i], "-U")==0)
         {
-            i++; // skip backup filename
+            i++; // Skip backup filename in update mode
             continue;
         }
         if(!is_txt(argv[i]))
@@ -170,6 +174,7 @@ int file_list_validation(int argc, char *argv[], filenames_t **head)
         }
         else
         {
+            // All checks passed - add to linked list
             filenames_t *new = malloc(sizeof(filenames_t));
             strcpy(new->filename, argv[i]);
             new->link = NULL;
@@ -190,12 +195,9 @@ int file_list_validation(int argc, char *argv[], filenames_t **head)
     return success;
 }
 
-
-/*HASH TABLE*/
-
+// Initialize hash table - set all heads to NULL
 void hash(hash_t *ht)
 {
-     //array of structure
     for(int i=0;i<28;i++)
-        ht[i].head = NULL;  //initially set NULL
+        ht[i].head = NULL;
 }
