@@ -1,68 +1,62 @@
-
 #include"header.h"
 
-int insert(char **file, hash_t *ht)//collecting cmd line arg_vector
+int insert(filenames_t *f_head, hash_t *ht) //collecting cmd line arg_vector
 {
-    int i=1;
-    while(file[i]!=NULL)
+    filenames_t *f_temp = f_head;
+    while(f_temp!=NULL)
     {
-        FILE *fp;
-        fp = fopen(file[i],"r");
-        if(!fp) return invalid;
+        FILE *fp = fopen(f_temp->filename,"r");
+        if(!fp){ f_temp = f_temp->link; continue; }
 
-        char word[200];
+        char word[WORD_SIZE];
+
         /*fscanf read formated inputs from file, here read str by str */
-        while(fscanf(fp, "%s", word)!= EOF)
+        while(fscanf(fp, "%s", word)==1)
         {
-            int indx = validate(word[0]); //pasing word 1st char for find index
-
+            int indx = validate(word[0]);  //pasing word 1st char for find index
             if(ht[indx].head==NULL)
             {
-                create(indx,word,file[i], ht);
+                create(indx, word, f_temp->filename, ht);
             }
             else
             {
-                 /*list not empty then compare word and filename*/
+                /*list not empty then compare word and filename*/
                 mainnode_t *temp = ht[indx].head;
-                int mflag=0, sflag=0;
-
+                int mflag=0;
                 while(temp!=NULL)
                 {
-                    /*comparing word, incase already present or not!*/
-                    if(strcmp(temp->word,word)==0) //equal then it already exist
+                    if(strcmp(temp->word, word)==0) //equal then it already exist
                     {
                         mflag=1; //word found
-                        /*then comare file name*/
+
+                         /*then comare file name*/
                         subnode_t *sub_temp = temp->slink;
+                        int sflag=0;
                         while(sub_temp!= NULL)
                         {
-                            if(strcmp(sub_temp->f_name,file[i])==0)
+                            if(strcmp(sub_temp->f_name, f_temp->filename)==0)
                             {
-                                sflag=1;  //file found
+                                sflag=1; //file found
                                 sub_temp->word_count++;
                                 break;
                             }
                             sub_temp = sub_temp->link;
                         }
-
-                        if(sflag==0) //word found but diff file name the crate sub node
+                        if(sflag==0)  //word found but diff file name the crate sub node
                         {
                             temp->file_count++;
-                            create_sub(file[i],temp,ht);
+                            create_sub(f_temp->filename, temp, ht);
                         }
                         break;
                     }
                     temp = temp->mlink;
                 }
-
                 if(mflag==0) //word not found then create newly
-                {
-                    create(indx,word,file[i],ht);
-                }
+                    create(indx, word, f_temp->filename, ht);
             }
         }
         fclose(fp);
-        i++;
+        f_temp = f_temp->link;
     }
     return success;
 }

@@ -1,0 +1,8 @@
+#0;all?;1;f2.txt;1#
+#0;all;1;f1.txt;1#
+#6;good;1;f1.txt;1#
+#7;Hai;1;f1.txt;1#
+#7;hai;1;f1.txt;1#
+#7;hello;2;f2.txt;1;f1.txt;2#
+#12;morning;1;f1.txt;1#
+#22;world;1;f1.txt;1#

@@ -1,6 +1,6 @@
-
-
 #include"header.h"
+
+
 /*find & returnng index position*/
 int validate(char ch)
 {
@@ -50,13 +50,12 @@ int create(int indx, char word[], char file[], hash_t *ht)
     if(ht[indx].head==NULL)
     {
         ht[indx].head = new;
-        return success;
     }
     else{
         new->mlink = ht[indx].head;
         ht[indx].head = new;
-        return success;
     }
+    return success;
 }
 
 /*Only sub node linking*/
@@ -72,10 +71,3 @@ int create_sub(char file[], mainnode_t *link, hash_t *ht)
     link->slink = subn; //linking
     return success;
 }
-
-
-
-
-
-
-
