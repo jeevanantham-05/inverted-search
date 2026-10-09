@@ -3,7 +3,8 @@
 int display_database(hash_t *ht)
 {
     int empty = 1; //like flagg...
-    for(int i=0;i<28;i++)
+
+    for(int i=0;i<28;i++)  // Scan all table
     {
         mainnode_t *temp = ht[i].head;
         while(temp!=NULL)
@@ -14,14 +15,15 @@ int display_database(hash_t *ht)
             while(sub!=NULL)
             {
                 printf("%s : %d time(s)", sub->f_name, sub->word_count);
-                if(sub->link!=NULL) printf(" : ");
+
+                if(sub->link!=NULL) printf(" : "); // Separator for multiple files
                 sub = sub->link;
             }
             printf("\n");
             temp = temp->mlink;
         }
     }
-    if(empty)
+    if(empty) //empty case
         printf("Database is empty\n");
     return success;
 }

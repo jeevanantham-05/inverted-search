@@ -6,7 +6,7 @@ int search_database(hash_t *ht, char *word)
     mainnode_t *temp = ht[indx].head;
     while(temp!=NULL)
     {
-        if(strcmp(temp->word, word)==0)
+        if(strcmp(temp->word, word)==0) // Word found
         {
             printf("Word [%s] is present in %d file(s)\n", word, temp->file_count);
             subnode_t *sub = temp->slink;
@@ -22,3 +22,4 @@ int search_database(hash_t *ht, char *word)
     printf("Word [%s] not found\n", word);
     return failure;
 }
+

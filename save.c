@@ -1,8 +1,9 @@
 #include"header.h"
 
+// Save database to backup file
 int save_database(hash_t *ht, char *fname)
 {
-    FILE *fp = fopen(fname, "w");
+    FILE *fp = fopen(fname, "w");  // Open backup file in write mode
     if(!fp) return failure;
     for(int i=0;i<28;i++)
     {

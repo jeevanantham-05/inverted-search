@@ -12,18 +12,19 @@ int update_database(hash_t *ht, filenames_t **f_head, char *backup_file)
     {
         // line: #index, word, file_count, fname, wcount, fname, wcount..
         if(line[0]!='#') continue;
-        char *token = strtok(line, "#;");
+        char *token = strtok(line, "#;"); // get index
         if(!token) continue;
         int indx = atoi(token);
 
-        token = strtok(NULL, ";");
+        token = strtok(NULL, ";"); // get word
         if(!token) continue;
         char word[WORD_SIZE]; strcpy(word, token);
 
-        token = strtok(NULL, ";");
+        token = strtok(NULL, ";"); // get file_count
         if(!token) continue;
         int file_count = atoi(token);
 
+        // Create main node
         mainnode_t *new = malloc(sizeof(mainnode_t));
         strcpy(new->word, word);
         new->file_count = file_count;
@@ -33,8 +34,8 @@ int update_database(hash_t *ht, filenames_t **f_head, char *backup_file)
         subnode_t *prev_sub = NULL;
         for(int i=0;i<file_count;i++)
         {
-            char *fname = strtok(NULL, ";");
-            char *wcount = strtok(NULL, ";#\n");
+            char *fname = strtok(NULL, ";"); // gett filename
+            char *wcount = strtok(NULL, ";#\n"); // get wordcount
             if(!fname ||!wcount) break;
 
             subnode_t *sub = malloc(sizeof(subnode_t));
@@ -42,6 +43,7 @@ int update_database(hash_t *ht, filenames_t **f_head, char *backup_file)
             sub->word_count = atoi(wcount);
             sub->link = NULL;
 
+            // Link sub nodes
             if(new->slink==NULL)
                 new->slink = sub;
             else
@@ -62,6 +64,7 @@ int update_database(hash_t *ht, filenames_t **f_head, char *backup_file)
                 }
             }
         }
+        // Insert into hash table
         if(ht[indx].head==NULL)
             ht[indx].head = new;
         else{
